@@ -1,0 +1,25 @@
+DYNAMIC BINARY ANALYSIS TOOLS, or DBA tools for short.
+These are tools that ANALYSE A PROGRAM’S MACHINE CODE AT RUN-TIME
+To do this, they AUGMENT THE ORIGINAL CODE WITH ANALYSIS CODE that runs in parallel with it
+The aim of this analysis code is to produce useful information that the programmer can use to improve their program.
+And in order to add the analysis code, we need some kind of instrumentation system
+
+One popular way to instrument programs is with DYNAMIC BINARY INSTRUMENTATION, or DBI for short
+Tools that use DBI ADD THE ANALYSIS CODE TO THE ORIGINAL MACHINE CODE AT RUN-TIME. Thus the instrumentation is dynamic, and the analysis is also dynamic.
+Here’s how it works: you don’t run any of the program’s original machine code, but instead recompile that code on-the-fly, instrumenting small blocks in a just-in-time fashion as the program runs, and storing the resulting code in a code cache so it only has to be instrumented once. 
+The nice thing about this is that it requires no preparation: you don’t have to recompile your program, or relink it.  Also you get 100% code coverage, and you don’t even need source code.
+
+A DBI frameworks’ main task is to take original code and add analysis code.  So it needs a way to represent both these kinds of code.  There are two fundamental ways to do this.  The first way we call Disassemble-and-resynthesise (or D&R for short), and that’s what Valgrind uses. The second way we call copy-and-annotate (or C&A for short), and that’s what other frameworks use.
+
+>Disassemble and resynthesise is conceptually simple.
+>First, the framework disassembles the original machine code into some kind of intermediate representation, or IR for short.
+>Then, tools add the analysis code during the instrumentation step just by adding more IR.  
+>Finally, the framework converts the instrumented IR back to machine code, which is then executed.
+>One crucial point is that the original code is not run, and so all side-effects of the original code must be explicit in IR, otherwise the resynthesized code won’t work.
+
+>In contrast, copy-and-annotate is quite different.
+>The framework takes the original machine code and annotates it with descriptions of its effects.
+>The tool then composes the analysis code during the instrumentation step according to those descriptions.
+>Finally, the framework creates the final code by copying the original machine code, mostly without change, and interleaving the analysis code around it. 
+>In summary:  With disassemble-and-resynthesise: you’re generating completely new code.  With copy-and-annotate: you’re augmenting the original code.
+
